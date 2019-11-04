@@ -1,0 +1,3 @@
+LIBRARY kinect_dll
+EXPORTS
+    Kinect_viewer @1
