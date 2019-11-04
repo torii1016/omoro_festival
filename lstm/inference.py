@@ -16,6 +16,7 @@ import torch.utils.data as data
 import torchvision
 #import torchvision.transforms as transforms
 
+
 class Inference( object ):
 
     def __init__( self, model_name ):
@@ -29,6 +30,17 @@ class Inference( object ):
         self.__hidden_size = 256
         self.__num_layers = 3
         self.__num_classes = 7
+
+        # min_max-parameters
+        self.__x_min = -2259.0780484289285
+        self.__x_max = 2548.842436486494
+        self.__y_min = -1186.3449394557435
+        self.__y_max = 939.5449823147761
+        self.__z_min = 241.1656126724124
+        self.__z_max = 3323.48
+        self.__v_min = np.array( [self.__x_min,self.__y_min,self.__z_min] )
+        self.__v_max = np.array( [self.__x_max,self.__y_max,self.__z_max] )
+        self.__max_min = self.__v_max-self.__v_min
 
         self.model = RNN( self.__input_size, self.__hidden_size, self.__num_layers, self.__num_classes ).to( self.device )
         self.param = torch.load( model_name )
@@ -45,9 +57,18 @@ class Inference( object ):
                     item = row
         return np.array( data, dtype='float32' ) # data.shape: list[50*26*3] 1 demension vector
     
-    def compute( self, input_data ):
+    def normalization( self, input_data ):
 
-        input_data = torch.from_numpy( input_data )
+        mins = np.reshape( self.__v_min.tolist()*int( input_data.shape[0]/3 ), input_data.shape )
+        output_data = ( input_data - mins )/( np.array( self.__max_min.tolist()*int( input_data.shape[0]/3 ) ) )
+        return output_data
+    
+    def compute( self, test_name ):
+
+        data = self.loading_file( test_name )
+        normalized_data = self.normalization( data )
+
+        input_data = torch.from_numpy( normalized_data )
         with torch.no_grad():
             data = input_data.reshape( -1, self.__sequence_length, self.__input_size ).to( self.device )
             outputs = self.model( data, self.device )
@@ -63,9 +84,7 @@ def main():
     args = parser.parse_args()
 
     inference = Inference( args.model_name )
-    data = inference.loading_file( args.test_name )
-
-    predicted = inference.compute( data )
+    predicted = inference.compute( args.test_name )
 
     print(f'predicted={predicted}')
 
