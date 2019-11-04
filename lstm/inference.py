@@ -61,7 +61,7 @@ class Inference( object ):
 
         mins = np.reshape( self.__v_min.tolist()*int( input_data.shape[0]/3 ), input_data.shape )
         output_data = ( input_data - mins )/( np.array( self.__max_min.tolist()*int( input_data.shape[0]/3 ) ) )
-        return output_data
+        return output_data.astype(np.float32)
     
     def compute( self, test_name ):
 
