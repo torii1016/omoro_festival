@@ -33,6 +33,7 @@ dataset - original              : raw data
 
 ## Docker
 $ sudo docker build -t omoro_docker .
+
 $ sudo docker run --runtime=nvidia -v /home/{path to omoro_featival folder}/omoro_festival:/home/contuser -it omoro_docker
 
 ## LSTM
