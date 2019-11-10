@@ -42,3 +42,23 @@ $ python3 train.py --save_model_name model_cpu.ckpt --epoch 50
 
 ### Inference
 $ python3 inference.py --model_name model_cpu.ckpt --test_name test.csv 
+
+## To taguchi
+### Create Training dataset
+$ python data_augmentation.py --aug_mode 0 --target_dataset original
+$ python data_augmentation.py --aug_mode 1 --target_dataset noise
+$ python data_augmentation.py --aug_mode 2 --target_dataset scaling
+$ python data_augmentation.py --aug_mode 3 --target_dataset translation
+$ python data_augmentation.py --aug_mode 4 --target_dataset rotation
+$ python data_normalization.py --target_dataset translation_y
+$ python data_normalization.py --target_dataset normalize --split_size 50
+$ mv ../dataset/split_50/ ../lstm/data/train
+$ trainから適当にval用データをピックアップ
+
+$ python data_normalization.py --target_dataset hogehoge（sociale_dataが存在するフォルダ名）
+(↑実行前の作業：./dataset/normalizeというフォルダ内に正規化されたデータが保存されるから、すでにnormalizeが存在していたら、それのフォルダ名を適当に変更すること）
+$ mv ../dataset/normalize/ ../lstm/data/test
+
+### Train & Test
+$ python train.py --epoch 100 --save_model_name hogehoge
+$ python test.py --model_name hogehoge --target_dataset test
