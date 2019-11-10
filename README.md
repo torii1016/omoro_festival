@@ -24,12 +24,12 @@ $ python data_normalization.py --target_dataset normalize --split_size 50
 ## Dataset
 - dataset
  - original              : raw data
-  - augmentation          : augmented data
-  - noise       : add gaussian noise (N(0,5)) to each node position (x,y,z)
-  - scaling     : z-value scaling (range[-100,100])
-  - translation : x-value translation (range[-100,100])
-  - rotation    : rotation around y axis (range[-45,45])
-  - translation : y-value translation (range[-30,30])
+   - augmentation          : augmented data
+   - noise       : add gaussian noise (N(0,5)) to each node position (x,y,z)
+   - scaling     : z-value scaling (range[-100,100])
+   - translation : x-value translation (range[-100,100])
+   - rotation    : rotation around y axis (range[-45,45])
+   - translation : y-value translation (range[-30,30])
  - all                   : raw data + augmented data
  - normalize             : data normalized to all dataset
  - split_50              : data split into 50 time series
