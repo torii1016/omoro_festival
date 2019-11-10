@@ -44,7 +44,6 @@ def augmentation_z_scaling( data ):
     tmp = [0,0,np.random.randint( -100, 100 )]*26
     scaling = np.empty( (0,26,3) , float )
     scaling = np.append( scaling, [np.array(tmp).reshape(26,3)], axis=0 )
-    #print( "scaling : {}".format( tmp[2] ) )
 
     augmentated_data = data + scaling
 
@@ -55,18 +54,29 @@ def augmentation_x_translation( data ):
     tmp = [np.random.randint( -100, 100 ),0,0]*26
     translation = np.empty( (0,26,3) , float )
     translation = np.append( translation, [np.array(tmp).reshape(26,3)], axis=0 )
-    #print( "translation : {}".format( tmp[0] ) )
 
     augmentated_data = data + translation
 
     return augmentated_data
+
+
+def augmentation_y_translation( data ):
+
+    tmp = [0, np.random.randint( -30, 30 ),0]*26
+    translation = np.empty( (0,26,3) , float )
+    translation = np.append( translation, [np.array(tmp).reshape(26,3)], axis=0 )
+
+    augmentated_data = data + translation
+
+    return augmentated_data
+
+
 
 def augmentation_y_rotation( data ):
 
     augmentated_data = np.copy( data )
 
     theta = ( np.pi/4.0*2.0 )*np.random.rand() - np.pi/4.0 
-    #print( "theta : {}".format( theta ) )
     rotation = np.array([[np.cos(theta), 0, -np.sin(theta)],[0, 1, 0],[np.sin(theta), 0, np.cos(theta)]])
     for k, tmp_1 in enumerate( data ):
         for j, tmp_2 in enumerate( tmp_1 ):
@@ -83,7 +93,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument( "--data_name", help="csv file name", default="default" )
-    parser.add_argument( "--aug_mode", help="augmentation mode, add noise[0] / z-value scaling[1] / x-value translation[2] / y-axis rotation[3]", default=0, type=int )
+    parser.add_argument( "--aug_mode", help="augmentation mode, add noise[0] / z-value scaling[1] / x-value translation[2] / y-axis rotation[3] / y-value translation[4]", default=0, type=int )
     parser.add_argument( "--target_dataset", help="augmentation target dataset name", default="original" )
     args = parser.parse_args()
 
@@ -99,7 +109,7 @@ def main():
     if args.aug_mode==0:
         augmentation_time = 50
     else:
-        augmentation_time = 20
+        augmentation_time = 30
 
     for file_ in files:
 
@@ -149,6 +159,17 @@ def main():
                 check_and_mkdir( path )
 
                 writing_file( augmentated_data, item, path + '/' + tmp[4] + '_rotation_' + str( i+1 ) + '.csv' )
+
+            elif args.aug_mode==4:
+                augmentated_data = augmentation_y_translation( data )
+
+                path = tmp[0] + '/' + tmp[1] + '/translation_y'
+                check_and_mkdir( path )
+                path = path + '/' + tmp[3]
+                check_and_mkdir( path )
+
+                writing_file( augmentated_data, item, path + '/' + tmp[4] + '_tranlation_y_' + str( i+1 ) + '.csv' )
+
 
 
 if __name__ == '__main__':

@@ -55,7 +55,7 @@ def calculate_xyz_max_min( data ):
             z_max = tmp_z_max
         if tmp_z_min<z_min:
             z_min = tmp_z_min
-    
+
     return x_min, x_max, y_min, y_max, z_min, z_max
 
 def normalization( data, min_v, max_v ):
@@ -85,59 +85,79 @@ def main():
     num_min = 9999
     num_max = -9999
 
+    target_list = []
+
     for file_ in files:
 
         name = file_.split( '.csv' )[0]
         tmp = name.split( '/' )
-        print( tmp[4] )
 
         data, item = loading_file( name + ".csv" )
         data = np.array( data, dtype=float )
 
         tmp_x_min, tmp_x_max, tmp_y_min, tmp_y_max, tmp_z_min, tmp_z_max = calculate_xyz_max_min( data )
 
-        if x_max<tmp_x_max:
-            x_max = tmp_x_max
-        if tmp_x_min<x_min:
-            x_min = tmp_x_min
-        if y_max<tmp_y_max:
-            y_max = tmp_y_max
-        if tmp_y_min<y_min:
-            y_min = tmp_y_min
-        if z_max<tmp_z_max:
-            z_max = tmp_z_max
-        if tmp_z_min<z_min:
-            z_min = tmp_z_min
+        if 1000<tmp_z_min and tmp_z_max<4000 :
 
-        if data.shape[0]<num_min:
-            num_min = data.shape[0]
-        if num_max<data.shape[0]:
-            num_max = data.shape[0]
+            if x_max<tmp_x_max:
+                x_max = tmp_x_max
+            if tmp_x_min<x_min:
+                x_min = tmp_x_min
+            if y_max<tmp_y_max:
+                y_max = tmp_y_max
+            if tmp_y_min<y_min:
+                y_min = tmp_y_min
+            if z_max<tmp_z_max:
+                z_max = tmp_z_max
+            if tmp_z_min<z_min:
+                z_min = tmp_z_min
 
+            if data.shape[0]<num_min:
+                num_min = data.shape[0]
+            if num_max<data.shape[0]:
+                num_max = data.shape[0]
+            
+            target_list.append(1)
+        
+        else:
+            target_list.append(0)
+            print( tmp[4] )
+        
+    """
+        target_list.append(1)
+
+    x_min = -2259.0780484289285
+    x_max = 2548.842436486494
+    y_min = -1186.3449394557435
+    y_max = 939.5449823147761
+    z_min = 1000.04
+    z_max = 3323.48
+    """
+    
     min_v = np.array( [x_min,y_min,z_min] )
     max_v = np.array( [x_max,y_max,z_max] )
     print( x_min, x_max, y_min, y_max, z_min, z_max )
     print( "num_min: {}, num_max:{}".format( num_min, num_max ) )
 
-    """
     files = glob.glob( "../dataset/" + args.target_dataset + "/**/*.csv", recursive=True )
-    for file_ in files:
+    for i,file_ in enumerate( files ):
 
-        name = file_.split( '.csv' )[0]
-        tmp = name.split( '/' )
+        if target_list[i]==1:
 
-        data, item = loading_file( name + ".csv" )
-        data = np.array( data, dtype=float )
+            name = file_.split( '.csv' )[0]
+            tmp = name.split( '/' )
 
-        augmentated_data = normalization( data, min_v, max_v )
+            data, item = loading_file( name + ".csv" )
+            data = np.array( data, dtype=float )
 
-        path = tmp[0] + '/' + tmp[1] + '/normalize'
-        check_and_mkdir( path )
-        path = path + '/' + tmp[3]
-        check_and_mkdir( path )
+            augmentated_data = normalization( data, min_v, max_v )
 
-        writing_file( augmentated_data, item, path + '/' + tmp[4] + '_normalize.csv' )
-    """
+            path = tmp[0] + '/' + tmp[1] + '/normalize'
+            check_and_mkdir( path )
+            path = path + '/' + tmp[3]
+            check_and_mkdir( path )
+
+            writing_file( augmentated_data, item, path + '/' + tmp[4] + '_normalize.csv' )
 
 if __name__ == '__main__':
     main()
