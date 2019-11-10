@@ -11,7 +11,6 @@ def make_datapath_list(phase="train"):
 
     rootpath = "./data/"
     target_path = osp.join(rootpath+phase+'/**/*.csv')
-    print(target_path)
 
     path_list = []
 
@@ -44,6 +43,8 @@ class LoadDataset(data.Dataset):
         elif self.phase == "val":
             label = csv_path[11:12]
             #print( f'labelname = {label}')
+        elif self.phase == "test":
+            label = csv_path[12:13]
 
         """
         # label2number
