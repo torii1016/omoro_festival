@@ -30,10 +30,10 @@ class Train( object ):
         self.__hidden_size = 256
         self.__num_layers = 3
         self.__num_classes = 7
-        self.__batch_size = 100 #256
+        self.__batch_size = 1000 #256
         self.__num_epochs = epoch
         self.__learning_rate = 0.00005
-        self.__weight_decay = 0.0001 # 0.0001
+        self.__weight_decay = 0.0000 # 0.0001
         self.__vat_alpha = 0.1
 
         self.model = RNN( self.__input_size, self.__hidden_size, self.__num_layers, self.__num_classes, sn ).to( self.device )
@@ -85,20 +85,47 @@ class Train( object ):
                 if (i+1) % self.__num_epochs == 0:
                     print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
                         .format( epoch+1, self.__num_epochs, i+1, total_step, loss.item()) )
+                    if ( i+1 )==10:                        
+                        torch.save( self.model.state_dict(), save_name + "_" + str( epoch ) + "_ver2_1.ckpt" )
+                    elif ( i+1 )==200:
+                        torch.save( self.model.state_dict(), save_name + "_" + str( epoch ) + "_ver2_2.ckpt" )
+                    elif ( i+1 )==400:
+                        torch.save( self.model.state_dict(), save_name + "_" + str( epoch ) + "_ver2_3.ckpt" )
+                    elif ( i+1 )==600:
+                        torch.save( self.model.state_dict(), save_name + "_" + str( epoch ) + "_ver2_4.ckpt" )
 
             if epoch==10:
                 torch.save( self.model.state_dict(), save_name + "_10.ckpt" )
             elif epoch==20:
                 torch.save( self.model.state_dict(), save_name + "_20.ckpt" )
+            elif epoch==30:
+                torch.save( self.model.state_dict(), save_name + "_30.ckpt" )
             elif epoch==40:
                 torch.save( self.model.state_dict(), save_name + "_40.ckpt" )
+            elif epoch==50:
+                torch.save( self.model.state_dict(), save_name + "_50.ckpt" )
             elif epoch==60:
                 torch.save( self.model.state_dict(), save_name + "_60.ckpt" )
+            elif epoch==70:
+                torch.save( self.model.state_dict(), save_name + "_70.ckpt" )
             elif epoch==80:
                 torch.save( self.model.state_dict(), save_name + "_80.ckpt" )
+            elif epoch==90:
+                torch.save( self.model.state_dict(), save_name + "_90.ckpt" )
+            elif epoch==100:
+                torch.save( self.model.state_dict(), save_name + "_100.ckpt" )
+            elif epoch==120:
+                torch.save( self.model.state_dict(), save_name + "_120.ckpt" )
+            elif epoch==140:
+                torch.save( self.model.state_dict(), save_name + "_140.ckpt" )
+            elif epoch==160:
+                torch.save( self.model.state_dict(), save_name + "_160.ckpt" )
+            elif epoch==180:
+                torch.save( self.model.state_dict(), save_name + "_180.ckpt" )
+            torch.save( self.model.state_dict(), save_name + "_" + str( epoch ) + "_ver2.ckpt" )
 
         # Save the model checkpoint
-        torch.save( self.model.state_dict(), save_name )
+        torch.save( self.model.state_dict(), save_name + ".ckpt" )
 
     def test( self ):
         # Test the model
