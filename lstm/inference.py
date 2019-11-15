@@ -45,18 +45,63 @@ class Inference( object ):
         self.model = RNN( self.__input_size, self.__hidden_size, self.__num_layers, self.__num_classes, sn ).to( self.device )
         self.param = torch.load( model_name )
         self.model.load_state_dict( self.param )
+        self.joint_heirarchy_length = self.loading_joint_hierarchy( "../joint_hierarchy.txt", "../joint_length.txt" )
 
     def loading_file( self, name ):
+
+        data = np.empty( (0,26,3) , float )
+        spilit_list = [3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75]
         with open( name ) as f:
-            data = []
             reader = csv.reader(f)
             for j, row in enumerate( reader ):
                 if j!=0 and j<=50:
-                    data += row
+                    tmp = np.split(row,spilit_list)
+                    data = np.append( data, [tmp], axis=0 )
                 else:
                     item = row
-        return np.array( data, dtype='float32' ) # data.shape: list[50*26*3] 1 demension vector
-    
+
+        return data
+
+    def loading_joint_hierarchy( self, name_connection, name_length ):
+
+        hierarchy = []
+        length = []
+        joint_hierarchy = []
+
+        f_connection = open( name_connection )
+        line = f_connection.readline() 
+        while line:
+            tmp_line = line.split( "," )
+            tmp_line2 = tmp_line[1].split( "\n" )
+            hierarchy.append( [int(tmp_line[0]),int(tmp_line2[0])] )
+            line = f_connection.readline()
+        f_connection.close
+
+        f_length = open( name_length )
+        line_length = f_length.readline() 
+        while line_length:
+            length.append( float(line_length) )
+            line_length = f_length.readline()
+        f_length.close
+
+        for i in range( len( hierarchy ) ):
+            joint_hierarchy.append( [hierarchy[i][0], hierarchy[i][1], length[i]] )
+
+        return joint_hierarchy
+
+
+    def size_normalization( self, data ):
+
+        normalized_data = np.copy( data )
+
+        for i, tmp_1 in enumerate( data ):
+            for tmp_2 in self.joint_heirarchy_length:
+                v = tmp_1[tmp_2[1]] - tmp_1[tmp_2[0]]
+                v_ = v / np.linalg.norm(v)
+                normalized_data[i][tmp_2[1]] = normalized_data[i][tmp_2[0]] + ( v_*tmp_2[2] )
+
+        return normalized_data.reshape( -1 )
+
     def normalization( self, input_data ):
 
         mins = np.reshape( self.__v_min.tolist()*int( input_data.shape[0]/3 ), input_data.shape )
@@ -66,7 +111,12 @@ class Inference( object ):
     def compute( self, test_name ):
 
         data = self.loading_file( test_name )
-        normalized_data = self.normalization( data )
+        data = np.array( data, dtype=float )
+        print( data.shape )
+
+        normalized_data = self.size_normalization( data )
+        print( normalized_data.shape )
+        normalized_data = self.normalization( normalized_data )
 
         input_data = torch.from_numpy( normalized_data )
         with torch.no_grad():
